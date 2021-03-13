@@ -1,13 +1,13 @@
 import sys, os, base64, datetime, hashlib, hmac 
 import requests
 
-from urllib3.exceptions import InsecureRequestWarning
-
+#from urllib3.exceptions import InsecureRequestWarning
 # Suppress only the single warning from urllib3 needed.
-requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
+#requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
 
 def _sign(key, msg):
     return hmac.new(key, msg.encode("utf-8"), hashlib.sha256).digest()
+
 
 def _getSignatureKey(key, date_stamp, regionName, serviceName):
     kDate = _sign(('AWS4' + key).encode('utf-8'), date_stamp)
@@ -15,6 +15,7 @@ def _getSignatureKey(key, date_stamp, regionName, serviceName):
     kService = _sign(kRegion, serviceName)
     kSigning = _sign(kService, 'aws4_request')
     return kSigning
+
 
 def query_signer(credentials, method, endpoint_prefix, 
                 host, region, endpoint, 
@@ -53,10 +54,11 @@ def query_signer(credentials, method, endpoint_prefix,
     headers = formatted_request['headers']
     headers['Authorization'] = authorization_header
 
-    r = requests.post(endpoint, data=request_parameters, headers=headers, verify=False)
+    r = requests.post(endpoint, data=request_parameters, headers=headers)
     headers.pop("Authorization")
 
     return r
+
 
 def json_signer(access_key, secret_key, token, method, endpoint_prefix, 
                 host, region, endpoint, content_type, amz_target, 
@@ -115,12 +117,14 @@ def json_signer(access_key, secret_key, token, method, endpoint_prefix,
     r = requests.post(endpoint, data=request_parameters, headers=headers, verify=False)
     return r
 
+
 def _build_canonical_headers(headers):
     headers_string = ""
     for header in headers.keys():
         headers_string += header.lower() + ":" + headers[header] + "\n"
 
     return headers_string
+
  
 def _build_signed_headers(headers):
     headers_string = ""

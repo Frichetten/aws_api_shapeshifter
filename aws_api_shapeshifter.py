@@ -17,6 +17,7 @@ def new(definition=DEFAULT_DEF_LOCATION):
 
     return to_return
 
+
 def convert_sts_to_cred_object(credentials):
     return Credentials(
         credentials['AccessKeyId'], 
@@ -27,6 +28,7 @@ def convert_sts_to_cred_object(credentials):
 def __read_api_definition(definition):
     with open(definition, 'r') as r:
         return json.loads(''.join(r.read()))
+
 
 class Credentials():
 

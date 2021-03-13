@@ -2,6 +2,7 @@ import api_signer
 import protocol_formatter
 import operation_obj
 
+
 SAFE_REGIONS = [
    "af-south-1",
    "ap-east-1",
@@ -41,6 +42,7 @@ class API:
         )
         self.endpoints = self.latest()['endpoints']
 
+
     # Returns the definiton of the lastest api version
     def latest(self):
         # Find the most recent api version
@@ -49,21 +51,26 @@ class API:
         options.sort()
         return self._definition[list(reversed(options))[0]]
 
+
     # Returns the latest api version
     def latest_version(self):
         return list(self._definition.keys())[0]
+
 
     # Returns a list of the available API versions
     def api_versions(self):
         return list(self._definition.keys())
 
+
     # Returns a list of all operations
     def list_operations(self):
         return list(self.operations.keys())
 
+
     # Returns the protocol
     def get_protocol(self):
         return self.protocol
+
 
     # Returns a dictionary with all the available operations
     def _make_operations_list(self, metadata, endpoints, shapes, operations):
@@ -73,5 +80,3 @@ class API:
 
         return to_return
             
-
-

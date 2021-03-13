@@ -81,6 +81,7 @@ class Operation:
 
         return "a"
         
+
     def _has_safe_regions(self, regions):
         # return true if it has safe regions
         # false if not
@@ -89,10 +90,12 @@ class Operation:
                 return True
         return False
 
+
     def _get_safe_region(self, regions):
         for region in regions:
             if region in SAFE_REGIONS:
                 return region
+
 
     def _test_hostname(self, hostname):
         try:
@@ -167,7 +170,6 @@ class Operation:
         return ""
 
 
-
     # GIVE THIS THE SHAPE, NOT THE NAME
     def _resolve_unknown_shape(self, shapes, unknown_shape, component_name):
         unknown_shape_type = unknown_shape['type']
@@ -188,11 +190,12 @@ class Operation:
         if unknown_shape_type == 'long':
             return (component_name, 1)
         if unknown_shape_type == 'map':
-            return (component_name, "a")
+            return (component_name, "map")
         if unknown_shape_type == 'double' or unknown_shape_type == 'float':
             return (component_name, 2.0)
         # Map not implemented -Xray
         print(unknown_shape_type)
+
 
     def _resolve_structure(self, shapes, structure, component_name):
         to_return = []
@@ -202,6 +205,7 @@ class Operation:
                 recurse_name = (component_name + "." + member + ".").strip('.')
                 to_return.append(self._resolve_unknown_shape(shapes, shapes[shape_name], recurse_name))
         return to_return
+
 
     def _resolve_list(self, shapes, list_shape, component_name):
         member_shape = list_shape['member']['shape']
@@ -214,12 +218,15 @@ class Operation:
         result = self._resolve_unknown_shape(shapes, shapes[member_shape], recurse_name)
         return result
 
+
     def _resolve_timestamp(self, shapes, timestamp, component_name):
         return (component_name, "1615593755.796672")
+
 
     def _resolve_blob(self, shapes, blob, component_name):
         return ("bbbbbbbbebfbebebbebebb")
  
+
     def _parse_input_shape(self, name, shapes, operation):
         to_return = {}
 
@@ -236,7 +243,14 @@ class Operation:
                 i = 2
                 for item in values:
                     if "." in item[0]:
-                        new_name = item[0] + "." + str(i//2)
+                        if "Key" in item[0]:
+                            new_name = item[0] + "." + str(i//2)
+                            new_name = new_name.replace(".Key.",".") + ".Key"
+                        elif "Value" in item[0]:
+                            new_name = item[0] + "." + str(i//2)
+                            new_name = item[0].replace(".Value.", ".") + ".Value"
+                        else:
+                            new_name = item[0] + "." + str(i//2)
                         i += 1
                         to_return[new_name] = item[1]
                     else:
@@ -246,6 +260,7 @@ class Operation:
 
         return ""
 
+
     def _flatten_list(self, list_in):
         if isinstance(list_in, list):
             for l in list_in:
@@ -254,6 +269,7 @@ class Operation:
 
         else:
             yield list_in
+
 
     def _gen_string_shape(self, member_shape, component_name):
         # min, max, pattern, enum
@@ -265,6 +281,7 @@ class Operation:
             return (component_name, 'a'*member_shape['min'])
         return (component_name, 'aaaaaa')
 
+
     def _gen_regex_pattern(self, pattern):
         # Some patterns break
         x = Xeger()
@@ -273,6 +290,7 @@ class Operation:
             return result
         except:
             return "a"
+
 
 def _resolve_credentials(kwargs):
     """ A user can send a few types of creds at us, and we 
