@@ -183,48 +183,66 @@ class Operation:
             return self._resolve_list(shapes, unknown_shape, component_name)
         if unknown_shape_type == 'timestamp':
             return self._resolve_timestamp(shapes, unknown_shape, component_name)
+        if unknown_shape_type == 'blob':
+            return self._resolve_blob(shapes, unknown_shape, component_name)
+        if unknown_shape_type == 'long':
+            return (component_name, 1)
+        if unknown_shape_type == 'map':
+            return (component_name, "a")
+        if unknown_shape_type == 'double' or unknown_shape_type == 'float':
+            return (component_name, 2.0)
+        # Map not implemented -Xray
+        print(unknown_shape_type)
 
     def _resolve_structure(self, shapes, structure, component_name):
         to_return = []
         for member in structure['members']:
-            shape_name = structure['members'][member]['shape']
-            recurse_name = (component_name + "." + member + ".").strip('.')
-            to_return.append(self._resolve_unknown_shape(shapes, shapes[shape_name], recurse_name))
+            if 'required' in structure.keys() and member in structure['required']:
+                shape_name = structure['members'][member]['shape']
+                recurse_name = (component_name + "." + member + ".").strip('.')
+                to_return.append(self._resolve_unknown_shape(shapes, shapes[shape_name], recurse_name))
         return to_return
 
     def _resolve_list(self, shapes, list_shape, component_name):
         member_shape = list_shape['member']['shape']
-        recurse_name = (component_name + "." + member_shape).strip('.')
+        if 'locationName' in list_shape['member'].keys():
+            location_name = list_shape['member']['locationName']
+        else:
+            # Learned from elasticache RemoveTagsFromResource
+            location_name = 'member'
+        recurse_name = (component_name + "." + location_name).strip('.')
         result = self._resolve_unknown_shape(shapes, shapes[member_shape], recurse_name)
         return result
 
     def _resolve_timestamp(self, shapes, timestamp, component_name):
         return (component_name, "1615593755.796672")
 
+    def _resolve_blob(self, shapes, blob, component_name):
+        return ("bbbbbbbbebfbebebbebebb")
  
     def _parse_input_shape(self, name, shapes, operation):
         to_return = {}
 
         # Not every operation has an input
-        if 'input' in operation.keys() and name == 'elasticache':
+        if 'input' in operation.keys():
             input_shape_name = operation['input']['shape']
             shape = shapes[input_shape_name]
              
-            # This is actual torture
-            # TODO: Refactor
-            result = self._resolve_unknown_shape(shapes, shape, "")
-            values = [f for f in self._flatten_list(result)]
-            i = 2
-            for item in values:
-                if "." in item[0]:
-                    new_name = item[0][:item[0].rfind(".")] + "." + str(i//2) + "." + item[0][item[0].rfind(".")+1:]
-                    i += 1
-                    to_return[new_name] = item[1]
-                else:
-                    to_return[item[0]] = item[1]
+            if "required" in shape.keys():
+                # This is actual torture
+                # TODO: Refactor
+                result = self._resolve_unknown_shape(shapes, shape, "")
+                values = [f for f in self._flatten_list(result)]
+                i = 2
+                for item in values:
+                    if "." in item[0]:
+                        new_name = item[0] + "." + str(i//2)
+                        i += 1
+                        to_return[new_name] = item[1]
+                    else:
+                        to_return[item[0]] = item[1]
 
-            return to_return
-
+                return to_return
 
         return ""
 
