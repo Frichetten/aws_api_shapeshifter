@@ -1,3 +1,4 @@
+import json
 import datetime
 
 from urllib.parse import urlencode
@@ -14,18 +15,35 @@ QUERY_DEFAULT_HEADERS = {
     'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
 }
 
+JSON_DEFAULT_HEADERS = {
+    'Content-Type': 'application/x-amz-json-'
+}
+# json version fills in the rest of the content type
+
 
 def query_protocol_formatter(host, token, name, version, input_format, headers=''):
     gathered_headers = _resolve_headers(headers, QUERY_DEFAULT_HEADERS)
     complete_headers = _complete_headers(gathered_headers, host, token)
     to_return = { 'headers' : complete_headers }
 
-    # TODO: Factor in the shape to create body params
-    # Currently only handling strings
     body_map = { 'Action': name }
     body_map['Version'] = version 
     body_map.update(input_format)
+
     to_return['body'] = urlencode(body_map)
+
+    return to_return
+
+
+def json_protocol_formatter(host, token, json_version, amz_target, input_format, headers={}):
+    # Need to fill in the Content-Type first
+    JSON_DEFAULT_HEADERS['Content-Type'] = JSON_DEFAULT_HEADERS['Content-Type'] + json_version
+    headers['X-Amz-Target'] = amz_target
+    gathered_headers = _resolve_headers(headers, JSON_DEFAULT_HEADERS)
+    complete_headers = _complete_headers(gathered_headers, host, token)
+    to_return = { 'headers' : complete_headers }
+
+    to_return['body'] = json.dumps(input_format)
 
     return to_return
 

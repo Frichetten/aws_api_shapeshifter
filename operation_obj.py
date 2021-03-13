@@ -57,27 +57,26 @@ class Operation:
             )
             return response
 
-        if self.metadata['protocol'] == "jsonfefe":
-            formatted_request = protocol_formatter.query_protocol_formatter(
-                method,
+        if self.metadata['protocol'] == "json":
+            json_version = self._resolve_json_version(self.metadata)
+            amz_target = self._resolve_target_prefix(self.metadata)
+            amz_target += "." + self.name
+            formatted_request = protocol_formatter.json_protocol_formatter(
                 host,
-                token,
-                request_map,
-                headers=headers
+                credentials.token,
+                json_version,
+                amz_target,
+                self.input_format
             )
             response = api_signer.json_signer(
-                access_key=access_key,
-                secret_key=secret_key,
-                token=token,
-                method=method,
-                endpoint_prefix=endpoint_prefix,
-                host=host,
-                region=region,
-                endpoint=endpoint,
-                content_type=content_type,
-                amz_target=amz_target,
-                request_uri=request_uri,
-                request_map=formatted_request
+                credentials,
+                method,
+                endpoint_prefix,
+                host,
+                region,
+                endpoint,
+                request_uri,
+                formatted_request
             )
             return response
 
@@ -146,7 +145,7 @@ class Operation:
         # iam is an example of this - Need to check for a hostname for a region
         # not in the keys (aws-global)
         potential = list(self.endpoints.keys())[0]
-        if region == self.endpoints[potential]['credentialScope']['region']:
+        if 'credentialScope' in self.endpoints[potential].keys() and region == self.endpoints[potential]['credentialScope']['region']:
             return self.endpoints[potential]['hostname']
 
         if 'hostname' in self.endpoints[region].keys():
@@ -176,6 +175,11 @@ class Operation:
             return metadata['targetPrefix']
         else:
             return metadata['endpointPrefix']
+
+    
+    def _resolve_json_version(self, metadata):
+        if 'jsonVersion' in metadata.keys():
+            return metadata['jsonVersion']
 
 
     def _resolve_shape_input(self, operation):
@@ -272,7 +276,7 @@ class Operation:
 
                 return to_return
 
-        return ""
+        return {}
 
 
     def _flatten_list(self, list_in):
