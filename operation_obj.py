@@ -33,6 +33,9 @@ class Operation:
         endpoint = self._resolve_endpoint(host, kwargs)
         request_uri = self._resolve_request_uri(kwargs)
 
+        if 'noparam' in kwargs.keys() or 'noparams' in kwargs.keys():
+            self.input_format = ""
+
         # Depending on the protocol we need to format inputs differently
         if self.metadata['protocol'] == "query":
             formatted_request = protocol_formatter.query_protocol_formatter(
@@ -128,12 +131,23 @@ class Operation:
             return 'us-east-1'
         
         # Otherwise, pick a random region that they support
-        return list(self.endpoints.keys())[0]
+        # Need to check for a credential scope region
+        potential = list(self.endpoints.keys())[0]
+        if "credentialScope" in self.endpoints[potential].keys():
+            return self.endpoints[potential]['credentialScope']['region']
+        
+        return potential
 
 
     def _resolve_host(self, region, endpoint_prefix, kwargs):
         if 'host' in kwargs.keys():
             return kwargs['host']
+
+        # iam is an example of this - Need to check for a hostname for a region
+        # not in the keys (aws-global)
+        potential = list(self.endpoints.keys())[0]
+        if region == self.endpoints[potential]['credentialScope']['region']:
+            return self.endpoints[potential]['hostname']
 
         if 'hostname' in self.endpoints[region].keys():
             return self.endpoints[region]['hostname'] 
