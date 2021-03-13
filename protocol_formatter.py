@@ -12,14 +12,17 @@ QUERY_DEFAULT_HEADERS = {
     'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
 }
 
-def query_protocol_formatter(method, host, token, request_map, headers=''):
+def query_protocol_formatter(host, token, name, version, input_format, headers=''):
     gathered_headers = _resolve_headers(headers, QUERY_DEFAULT_HEADERS)
     complete_headers = _complete_headers(gathered_headers, host, token)
     to_return = { 'headers' : complete_headers }
 
     # TODO: Factor in the shape to create body params
     # Currently only handling strings
-    to_return['body'] = urlencode(request_map)
+    body_map = { 'Action': name }
+    body_map['Version'] = version 
+    body_map.update(input_format)
+    to_return['body'] = urlencode(body_map)
 
     return to_return
 
