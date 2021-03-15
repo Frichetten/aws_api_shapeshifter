@@ -61,7 +61,7 @@ def query_signer(credentials, method, endpoint_prefix,
 
 
 def json_signer(credentials, method, endpoint_prefix, 
-                host, region, endpoint, 
+                host, region, endpoint, signing_name,
                 request_uri, formatted_request):
 
     request_parameters = formatted_request['body']
@@ -85,10 +85,10 @@ def json_signer(credentials, method, endpoint_prefix,
     canonical_request = method + '\n' + canonical_uri + '\n' + canonical_querystring + '\n' + canonical_headers + '\n' + signed_headers + '\n' + payload_hash
 
     algorithm = 'AWS4-HMAC-SHA256'
-    credential_scope = date_stamp + '/' + region + '/' + endpoint_prefix + '/' + 'aws4_request'
+    credential_scope = date_stamp + '/' + region + '/' + signing_name + '/' + 'aws4_request'
     string_to_sign = algorithm + '\n' +  formatted_request['headers']['X-Amz-Date'] + '\n' +  credential_scope + '\n' +  hashlib.sha256(canonical_request.encode('utf-8')).hexdigest()
 
-    signing_key = _getSignatureKey(credentials.secret_key, date_stamp, region, endpoint_prefix)
+    signing_key = _getSignatureKey(credentials.secret_key, date_stamp, region, signing_name)
 
     signature = hmac.new(signing_key, (string_to_sign).encode('utf-8'), hashlib.sha256).hexdigest()
 
@@ -97,7 +97,7 @@ def json_signer(credentials, method, endpoint_prefix,
     headers = formatted_request['headers']
     headers['Authorization'] = authorization_header
 
-    r = requests.post(endpoint, data=request_parameters, headers=headers)
+    r = requests.post(endpoint, data=request_parameters, headers=headers, verify=False)
     headers.pop("Authorization")
 
     return r
