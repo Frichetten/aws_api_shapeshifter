@@ -10,7 +10,6 @@ ALL_DEFAULT_HEADERS = {
     'X-Amz-Security-Token': '',
 }
 
-
 QUERY_DEFAULT_HEADERS = {
     'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
 }
@@ -35,14 +34,17 @@ def query_protocol_formatter(host, token, name, version, input_format, headers='
     return to_return
 
 
-def json_protocol_formatter(host, token, json_version, amz_target, input_format, headers={}):
+def json_protocol_formatter(host, token, json_version, amz_target, input_format):
     # Need to fill in the Content-Type first
-    JSON_DEFAULT_HEADERS['Content-Type'] = JSON_DEFAULT_HEADERS['Content-Type'] + json_version
+    headers = {}
+    to_return = {}
+    headers['Content-Type'] = JSON_DEFAULT_HEADERS['Content-Type'] + json_version
     headers['X-Amz-Target'] = amz_target
     gathered_headers = _resolve_headers(headers, JSON_DEFAULT_HEADERS)
     complete_headers = _complete_headers(gathered_headers, host, token)
-    to_return = { 'headers' : complete_headers }
+    to_return['headers'] = complete_headers 
 
+    print(input_format)
     to_return['body'] = json.dumps(input_format)
 
     return to_return
@@ -59,7 +61,7 @@ def _resolve_headers(custom_headers, default_headers):
 def _apply_custom_headers(custom_headers, default_headers):
     """ A user may apply a custom header for their request. These will be
     appended to the default headers. """
-    to_return = default_headers
+    to_return = default_headers.copy()
     to_return.update(custom_headers)
     to_return.update(ALL_DEFAULT_HEADERS)
 
