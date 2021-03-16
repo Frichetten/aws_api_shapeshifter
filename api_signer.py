@@ -97,7 +97,7 @@ def json_signer(credentials, method, endpoint_prefix,
     headers = formatted_request['headers']
     headers['Authorization'] = authorization_header
 
-    r = requests.post(endpoint+canonical_uri, data=request_parameters, headers=headers, verify=False)
+    r = requests.post(endpoint+canonical_uri, data=request_parameters, headers=headers)
     headers.pop("Authorization")
 
     return r

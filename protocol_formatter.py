@@ -34,17 +34,20 @@ def query_protocol_formatter(host, token, name, version, input_format, headers='
     return to_return
 
 
-def json_protocol_formatter(host, token, json_version, amz_target, input_format):
+def json_protocol_formatter(host, token, json_version, amz_target, kwargs, input_format):
     # Need to fill in the Content-Type first
     headers = {}
     to_return = {}
     headers['Content-Type'] = JSON_DEFAULT_HEADERS['Content-Type'] + json_version
+    # TODO: Make the kwargs header modifications better
+    if "content_type" in kwargs.keys():
+        headers['Content-Type'] = kwargs['content_type']
+
     headers['X-Amz-Target'] = amz_target
     gathered_headers = _resolve_headers(headers, JSON_DEFAULT_HEADERS)
     complete_headers = _complete_headers(gathered_headers, host, token)
     to_return['headers'] = complete_headers 
 
-    print(input_format)
     to_return['body'] = json.dumps(input_format)
 
     return to_return
@@ -58,7 +61,6 @@ def rest_json_protocol_formatter(host, token, json_version, input_format):
     complete_headers = _complete_headers(gathered_headers, host, token)
     to_return['headers'] = complete_headers 
 
-    print(input_format)
     to_return['body'] = json.dumps(input_format)
 
     return to_return

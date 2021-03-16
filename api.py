@@ -34,13 +34,13 @@ class API:
         self._definition = service_definition
         self._latest_version = self.latest_version()
         self.protocol = self.latest()['metadata']['protocol']
+        self.endpoints = self.latest()['endpoints']
         self.operations = self._make_operations_list(
             self.latest()['metadata'], 
-            self.latest()['endpoints'], 
+            self.latest()['endpoints'],
             self.latest()['shapes'], 
             self.latest()['operations']
         )
-        self.endpoints = self.latest()['endpoints']
 
 
     # Returns the definiton of the lastest api version

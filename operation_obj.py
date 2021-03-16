@@ -64,11 +64,13 @@ class Operation:
             amz_target = self._resolve_target_prefix(self.metadata)
             amz_target += "." + self.name
             signing_name = self._resolve_signing_name(self.metadata, kwargs)
+
             formatted_request = protocol_formatter.json_protocol_formatter(
                 host,
                 credentials.token,
                 json_version,
                 amz_target,
+                kwargs,
                 self.input_format
             )
             response = api_signer.json_signer(
@@ -151,7 +153,12 @@ class Operation:
         if 'signing_name' in kwargs.keys():
             return kwargs['signing_name']
 
-        return metadata['signingName']
+        # if we have a signing name
+        if 'signing_name' in metadata.keys():
+            return metadata['signingName']
+
+        # Give up and go with endpointPrefix
+        return metadata['endpointPrefix']
 
     def _resolve_region(self, kwargs):
         if 'region' in kwargs.keys():
@@ -183,6 +190,7 @@ class Operation:
         if 'hostname' in self.endpoints[region].keys():
             return self.endpoints[region]['hostname'] 
         
+        # TODO: Check ,but I don't think we ever get here.
         # I know this is broken but will wait to fix until I have 
         # more examples
         return endpoint_prefix + "." + region + ".amazonaws.com"
