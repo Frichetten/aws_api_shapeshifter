@@ -84,6 +84,29 @@ class Operation:
             )
             return response
 
+        if self.metadata['protocol'] == "rest-json":
+            json_version = self._resolve_json_version(self.metadata)
+            signing_name = self._resolve_signing_name(self.metadata, kwargs)
+            formatted_request = protocol_formatter.rest_json_protocol_formatter(
+                host,
+                credentials.token,
+                json_version,
+                self.input_format
+            )
+            response = api_signer.json_signer(
+                credentials,
+                method,
+                endpoint_prefix,
+                host,
+                region,
+                endpoint,
+                signing_name,
+                request_uri,
+                formatted_request
+            )
+            return response
+
+
 
         return "a"
         

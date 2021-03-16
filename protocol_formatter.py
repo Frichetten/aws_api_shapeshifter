@@ -49,6 +49,21 @@ def json_protocol_formatter(host, token, json_version, amz_target, input_format)
 
     return to_return
 
+def rest_json_protocol_formatter(host, token, json_version, input_format):
+    # Need to fill in the Content-Type first
+    headers = {}
+    to_return = {}
+    headers['Content-Type'] = JSON_DEFAULT_HEADERS['Content-Type'] + json_version
+    gathered_headers = _resolve_headers(headers, JSON_DEFAULT_HEADERS)
+    complete_headers = _complete_headers(gathered_headers, host, token)
+    to_return['headers'] = complete_headers 
+
+    print(input_format)
+    to_return['body'] = json.dumps(input_format)
+
+    return to_return
+
+
 
 def _resolve_headers(custom_headers, default_headers):
     if custom_headers == '':
