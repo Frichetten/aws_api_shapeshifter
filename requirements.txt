@@ -1,2 +1,3 @@
+requests
 xeger
 boto3

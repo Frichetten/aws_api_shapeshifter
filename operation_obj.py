@@ -36,7 +36,7 @@ class Operation:
         request_uri = self._resolve_request_uri(kwargs)
 
         if 'noparam' in kwargs.keys() or 'noparams' in kwargs.keys():
-            self.input_format = ""
+            self.input_format = {}
 
         # Depending on the protocol we need to format inputs differently
         if self.metadata['protocol'] == "query":
