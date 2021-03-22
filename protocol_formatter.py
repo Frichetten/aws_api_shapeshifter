@@ -20,10 +20,13 @@ JSON_DEFAULT_HEADERS = {
 # json version fills in the rest of the content type
 
 
-def query_protocol_formatter(host, token, name, version, input_format, headers=''):
+def query_protocol_formatter(host, token, name, version, kwargs, input_format):
+    headers = {}
     gathered_headers = _resolve_headers(headers, QUERY_DEFAULT_HEADERS)
     complete_headers = _complete_headers(gathered_headers, host, token)
     to_return = { 'headers' : complete_headers }
+    if "content_type" in kwargs.keys():
+        to_return['headers']['Content-Type'] = kwargs['content_type']
 
     body_map = { 'Action': name }
     body_map['Version'] = version 
