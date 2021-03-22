@@ -36,6 +36,7 @@ class Operation:
         request_uri = self._resolve_request_uri(kwargs)
 
         if 'noparam' in kwargs.keys() or 'noparams' in kwargs.keys():
+            # TODO: Should be {}
             self.input_format = {}
 
         # Depending on the protocol we need to format inputs differently
@@ -45,6 +46,7 @@ class Operation:
                 credentials.token,
                 name,
                 version,
+                kwargs,
                 self.input_format
             )
             response = api_signer.query_signer(
@@ -108,9 +110,7 @@ class Operation:
             )
             return response
 
-
-
-        return "a"
+        return None
         
 
     def _has_safe_regions(self, regions):
@@ -154,7 +154,7 @@ class Operation:
             return kwargs['signing_name']
 
         # if we have a signing name
-        if 'signing_name' in metadata.keys():
+        if 'signingName' in metadata.keys():
             return metadata['signingName']
 
         # Give up and go with endpointPrefix
@@ -220,6 +220,11 @@ class Operation:
     def _resolve_json_version(self, metadata):
         if 'jsonVersion' in metadata.keys():
             return metadata['jsonVersion']
+
+        # Otherwise you likely know what you want to do
+        # In fact it's likely what you're testing
+        # I'll give you a 1.0 so you don't complain
+        return "1.0"
 
 
     def _resolve_shape_input(self, operation):
