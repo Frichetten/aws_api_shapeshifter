@@ -95,9 +95,10 @@ class Operation:
                 host,
                 credentials.token,
                 json_version,
+                kwargs,
                 self.input_format
             )
-            response = api_signer.json_signer(
+            response = api_signer.rest_json_signer(
                 credentials,
                 method,
                 endpoint_prefix,
