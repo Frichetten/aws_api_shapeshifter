@@ -1,5 +1,6 @@
 import json
 import datetime
+import re
 
 from urllib.parse import urlencode
 
@@ -58,7 +59,7 @@ def json_protocol_formatter(host, token, json_version, amz_target, kwargs, input
 
     return to_return
 
-def rest_json_protocol_formatter(host, token, json_version, kwargs, input_format):
+def rest_json_protocol_formatter(host, token, json_version, request_uri, kwargs, input_format):
     # Need to fill in the Content-Type first
     headers = {}
     to_return = {}
@@ -69,6 +70,10 @@ def rest_json_protocol_formatter(host, token, json_version, kwargs, input_format
     gathered_headers = _resolve_headers(headers, REST_JSON_DEFAULT_HEADERS)
     complete_headers = _complete_headers(gathered_headers, host, token)
     to_return['headers'] = complete_headers 
+
+    # Need to act on the parameters in the URI
+    # TODO replace params with type appropriate ones
+    to_return['request_uri'] = re.sub("\{(.*?)\}", "", request_uri) 
 
     to_return['body'] = json.dumps(input_format)
 

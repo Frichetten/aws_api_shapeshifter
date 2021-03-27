@@ -35,12 +35,19 @@ class Operation:
         endpoint = self._resolve_endpoint(host, kwargs)
         request_uri = self._resolve_request_uri(kwargs)
 
+        # TODO: Clean this up
         if 'noparam' in kwargs.keys() or 'noparams' in kwargs.keys():
             # TODO: Should be {}
             self.input_format = {}
 
+        if 'protocol' in kwargs.keys():
+            protocol = kwargs['protocol']
+        else:
+            protocol = self.metadata['protocol']
+
+
         # Depending on the protocol we need to format inputs differently
-        if self.metadata['protocol'] == "query":
+        if protocol == "query":
             formatted_request = protocol_formatter.query_protocol_formatter(
                 host,
                 credentials.token,
@@ -61,7 +68,7 @@ class Operation:
             )
             return response
 
-        if self.metadata['protocol'] == "json":
+        if protocol == "json":
             json_version = self._resolve_json_version(self.metadata)
             amz_target = self._resolve_target_prefix(self.metadata)
             amz_target += "." + self.name
@@ -88,13 +95,14 @@ class Operation:
             )
             return response
 
-        if self.metadata['protocol'] == "rest-json":
+        if protocol == "rest-json":
             json_version = self._resolve_json_version(self.metadata)
             signing_name = self._resolve_signing_name(self.metadata, kwargs)
             formatted_request = protocol_formatter.rest_json_protocol_formatter(
                 host,
                 credentials.token,
                 json_version,
+                request_uri,
                 kwargs,
                 self.input_format
             )
@@ -106,7 +114,7 @@ class Operation:
                 region,
                 endpoint,
                 signing_name,
-                request_uri,
+                formatted_request['request_uri'],
                 formatted_request
             )
             return response

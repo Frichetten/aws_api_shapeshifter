@@ -54,7 +54,7 @@ def query_signer(credentials, method, endpoint_prefix,
     headers = formatted_request['headers']
     headers['Authorization'] = authorization_header
 
-    r = requests.post(endpoint, data=request_parameters, headers=headers)
+    r = requests.request(method, endpoint, data=request_parameters, headers=headers)
     headers.pop("Authorization")
 
     return r
@@ -97,7 +97,7 @@ def json_signer(credentials, method, endpoint_prefix,
     headers = formatted_request['headers']
     headers['Authorization'] = authorization_header
 
-    r = requests.post(endpoint+canonical_uri, data=request_parameters, headers=headers)
+    r = requests.request(method, endpoint+canonical_uri, data=request_parameters, headers=headers)
     headers.pop("Authorization")
 
     return r
@@ -143,7 +143,7 @@ def rest_json_signer(credentials, method, endpoint_prefix,
     headers = formatted_request['headers']
     headers['Authorization'] = authorization_header
 
-    r = requests.request(method, endpoint+canonical_uri, headers=headers, verify=False)
+    r = requests.request(method, endpoint+canonical_uri, data=request_parameters, headers=headers, verify=False)
     headers.pop("Authorization")
 
     return r
