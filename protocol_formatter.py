@@ -4,11 +4,11 @@ import re
 
 from urllib.parse import urlencode
 
-
+# TODO: If we are using temp creds, need to include X-Amz-Security-Token header
+# Otherwise, don't include
 ALL_DEFAULT_HEADERS = {
     'Host': '',
     'X-Amz-Date': '',
-    'X-Amz-Security-Token': '',
 }
 
 QUERY_DEFAULT_HEADERS = {

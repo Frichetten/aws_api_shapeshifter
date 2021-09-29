@@ -171,7 +171,7 @@ class Operation:
 
     def _resolve_region(self, kwargs):
         if 'region' in kwargs.keys():
-            return kwargs['method']
+            return kwargs['region']
         
         # ngl, gonna prefer us-east-1
         if 'us-east-1' in self.endpoints.keys():
