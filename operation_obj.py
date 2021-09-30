@@ -25,7 +25,7 @@ class Operation:
     # make_request will take the requested modifications (if any) and make the request to the AWS API
     def make_request(self, **kwargs):
         name = self.name
-        self.input_format = self._parse_input_shape(self.metadata['endpointPrefix'], self.shapes, self.operation)
+        self.input_format = self._parse_input_shape(self.metadata['endpointPrefix'], self.shapes, self.operation, kwargs)
         version = self.metadata['apiVersion']
         credentials = _resolve_credentials(kwargs)
         endpoint_prefix = self._resolve_endpoint_prefix(kwargs)
@@ -300,8 +300,12 @@ class Operation:
         return "bbbbbbbbebfbebebbebebb"
  
 
-    def _parse_input_shape(self, name, shapes, operation):
+    def _parse_input_shape(self, name, shapes, operation, kwargs):
         to_return = {}
+
+        # We may have params in our kwargs and we need to process them
+        # We are going to support a "Append" format
+        # Not sure what that means right now. Going to work on it
 
         # Not every operation has an input
         if 'input' in operation.keys():
@@ -315,6 +319,12 @@ class Operation:
                     shape_name = shape['members'][required]['shape']
                     result = self._resolve_unknown_shape(shapes, shapes[shape_name])
                     to_return[required] = result
+
+                # Parsing params for kwargs
+                if 'params' in kwargs.keys():
+                    passed_params = kwargs['params']
+                    for key in passed_params.keys():
+                        to_return[key] = passed_params[key]
 
                 return to_return
                 # Leaving this code here for now. Going to need to 
