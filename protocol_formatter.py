@@ -105,7 +105,7 @@ def _complete_headers(headers, host, token):
         if header == 'X-Amz-Date':
             headers[header] = _get_date_string()
         if header == 'Host':
-            headers[header] = host
+            headers[header] = host.split("/")[0]
         if header == 'X-Amz-Security-Token':
             headers[header] = token
 

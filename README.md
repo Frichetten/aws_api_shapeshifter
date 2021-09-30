@@ -2,7 +2,8 @@
 A small library to alter AWS API requests; Used for fuzzing research
 
 ## Currently Supported Parameter Options
-* Content-Type (String)
-* noparams (Boolean)
-* creds (Credentials object)
+* content_type (String) 
+* noparams (Boolean) 
+* creds (Credentials object) 
+* host (String) 
 * protocol (json | ec2 | query | rest-json | rest-xml)
