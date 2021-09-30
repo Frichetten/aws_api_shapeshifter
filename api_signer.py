@@ -115,6 +115,12 @@ def rest_json_signer(credentials, method, endpoint_prefix,
     t = datetime.datetime.utcnow()
     date_stamp = t.strftime('%Y%m%d')
 
+    # TODO: UGLY HACK PLEASE FIX
+    if "prod" in host:
+        canonical_uri_in_request = "/prod" + request_uri
+    else:
+        canonical_uri_in_request = request_uri
+
     canonical_uri = request_uri
 
     ## Step 3: Create the canonical query string. In this example, request
@@ -128,7 +134,7 @@ def rest_json_signer(credentials, method, endpoint_prefix,
 
     payload_hash = hashlib.sha256(request_parameters.encode('utf-8')).hexdigest()
 
-    canonical_request = method + '\n' + canonical_uri + '\n' + canonical_querystring + '\n' + canonical_headers + '\n' + signed_headers + '\n' + payload_hash
+    canonical_request = method + '\n' + canonical_uri_in_request + '\n' + canonical_querystring + '\n' + canonical_headers + '\n' + signed_headers + '\n' + payload_hash
 
     algorithm = 'AWS4-HMAC-SHA256'
     credential_scope = date_stamp + '/' + region + '/' + signing_name + '/' + 'aws4_request'
