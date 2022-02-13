@@ -10,6 +10,9 @@ This library is **NOT** maintained and is provided as is. I realized it was mark
 
 **DO NOT BLINDLY FUZZ EVERY API ACTION. YOU WILL END UP WITH A HEFTY BILL. I DO NOT TAKE RESPONSIBILITY FOR ANY COSTS ASSOCIATED WITH USING THIS SOFTWARE.**
 
+## How to Use
+There are some examples in [this](https://twitter.com/Frichette_n/status/1492707114250383368?s=20&t=7h1yvuHaKwVu60q9e2Y_uQ) Twitter thread. 
+
 ## Currently Supported Parameter Options
 * content_type (String) 
 * noparams (Boolean) 
